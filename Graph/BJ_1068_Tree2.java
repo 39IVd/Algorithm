@@ -10,7 +10,7 @@ import java.util.Set;
 //            각 node의 모든 조상 중, 제거된 node가 하나라도 있을 경우 parent[node]=-2로 표시한다.)
 //    2. 남은 node의 개수를 res에 저장. (parent[]=-2인 node의 개수를 구함.)
 //    3. 남은 node들의 parent를 Set에 저장한다.
-//    4. 남은 node의 개수 (res)-parent Set의 size = leaf node의 개수를 구한다.
+//    4. 남은 node의 개수 (result)-parent Set의 size = leaf node의 개수를 구한다.
 
 
 public class BJ_1068_Tree2 {
@@ -39,7 +39,7 @@ public class BJ_1068_Tree2 {
 //            System.out.print(parent[i]+" ");
 //        }
 //        System.out.println();
-//        System.out.println("res : "+res);
+//        System.out.println("result : "+result);
 
         for(int i=0;i<n;i++) {
             if(parent[i]!=-2&&parent[i]!=-1) {

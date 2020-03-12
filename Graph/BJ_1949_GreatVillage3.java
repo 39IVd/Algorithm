@@ -1,94 +1,66 @@
-//package Graph;
+package Graph;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Scanner;
+
+//    트리의 독립집합 중, 노드의 가중치의 합이 최소인 집합 구하기. (최소독립집합)
 //
-//import java.util.*;
+//    한 노드에서 시작해서, dfs로 모든 child를 탐색한다.
+//    dp[현재노드][0] : 현재 노드를 포함하지 않았을 때 가중치의 총합.
+//    dp[현재노드][1] : 현재 노드를 포함했을 때 가중치의 총합.
 //
-////class Edge {
-////    int a, b;
-////    public Edge(int a, int b) {
-////        this.a = a; this.b = b;
-////    }
-////}
-//class Node implements Comparable<Node> {
-//    int index, number, visited;
-//    public Node(int index, int number, int visited) {
-//        this.index = index;
-//        this.number = number;
-//        this.visited = visited;
-//    }
+//    Algorithm
+//    1. 각 노드의 가중치, edge를 초기화한다.
+//    2. dfs 함수를 돌면서,
+//        2-1. visited[현재노드] = 1 로 변경한다.
+//        2-2. dp[현재노드][0] = 0, dp[현재노드][1] = weight[현재노드] 로 변경한다.
+//        2-3. for문을 돌면서,
+//            - 현재 노드의 child 노드 중, visited = 0인 노드들에 대해,
+//            - dfs(child)로 child 노드를 먼저 방문한다.
+//            - dp[현재노드][0] += Math.max(dp[child][0], dp[child][1]) 로 변경한다.
+//                => 현재 노드를 포함하지 않을 경우, 자식 노드를 포함해도 되고 포함하지 않아도 되기 때문에,
+//                두 경우 중 값이 큰 것을 더한다.
+//            - dp[현재노드][1] = dp[child][0]으로 변경한다.
+//                => 현재 노드를 포함할 경우, 자식 노드는 반드시 포함하지 않아야 하기 때문.
 //
-//    @Override
-//    public int compareTo(Node o) {
-//        if(this.number>o.number) {
-//            return -1;
+//        2-4. leaf노드 (child가 없는 노드)일 경우, dfs는 종료한다.
+
+
+public class BJ_1949_GreatVillage3 {
+    static Scanner in = new Scanner(System.in);
+    static int n;
+    static int[][] dp = new int[10001][2];
+    static int[] weight = new int[10001];
+    static List<Integer>[] edge = new List[10001];
+    static int[] visited = new int[10001];
+    public static void main(String[] args) {
+        n = in.nextInt();
+        for(int i=1;i<=n;i++) {
+            weight[i] = in.nextInt();
+            edge[i] = new LinkedList<>();
+        }
+        for(int i=0;i<n-1;i++) {
+            int a = in.nextInt(); int b = in.nextInt();
+            edge[a].add(b); edge[b].add(a);
+        }
+        dfs(1);
+        System.out.println(Math.max(dp[1][0], dp[1][1]));
+//        for(int i=1;i<=n;i++) {
+//            System.out.println(dp[i][0]+" "+dp[i][1]);
 //        }
-//        else if(this.number<o.number) {
-//            return 1;
-//        }
-//        else {
-//            return 0;
-//        }
-//    }
-//}
-//
-//public class BJ_1949_GreatVillage3 {
-//    static Scanner in = new Scanner(System.in);
-//    static int n;
-//    static int[][] num = new int[100000][3];
-//    static List<Integer> selectNodeList = new LinkedList<>();
-//    static List<Edge> edgeList = new LinkedList<>();
-//    static ArrayList<Node> nodes = new ArrayList<>();
-//    public static void main(String[] args) {
-//        n = in.nextInt();
-//        int maxIndex = -1, max = 0;
-//        for(int i=0;i<n;i++) {
-//            int index = i;
-//            int number = in.nextInt();
-//            nodes.add(new Node(index, number, 0));
-//        }
-//        Collections.sort(nodes);
-//        for(int i=0;i<n;i++) {
-//            System.out.println("index : "+nodes.get(i).index+", number : "+nodes.get(i).number);
-//        }
-//        for(int i=0;i<n-1;i++) {
-//            int a = in.nextInt(); int b = in.nextInt();
-//            edgeList.add(new Edge(a, b));
-//        }
-//        int cnt = 0;
-//        while (!nodes.isEmpty()) {
-//            Node n = nodes.get(cnt);
-//            n.visited = 1;
-//            selectNodeList.add(n.index);
-//            for(int i=0;i<edgeList.size();i++) {
-//                Edge curr = edgeList.get(i);
-//                if(curr.a==n.index) {
-//                    num[curr.b][1] = 1;
-//                }
-//                else if(curr.b==n.index) {
-//                    num[curr.a][1] = 1;
-//                }
-//            }
-//            max = 0;
-//            boolean all = false;
-//            for(int i=1;i<=n;i++) {
-//                if(max<num[i][0] && i!=maxIndex) {
-//                    if(num[i][1]!=1) {
-//                        max = num[i][0];
-//                        maxIndex = i;
-//                        all = true;
-//                    }
-//                }
-//            }
-////            System.out.println("maxIndex : "+maxIndex);
-//            if(!all) {
-//                break;
-//            }
-//            cnt++;
-//        }
-//        int res = 0;
-//        for(int i=0;i<selectNodeList.size();i++) {
-//            res += num[selectNodeList.get(i)][0];
-//        }
-//        System.out.println(res);
-//
-//    }
-//}
+    }
+    public static void dfs(int curr) {
+        visited[curr] = 1;
+        dp[curr][0] = 0;
+        dp[curr][1] = weight[curr];
+        for(int i=0;i<edge[curr].size();i++) {
+            int child = edge[curr].get(i);
+            if(visited[child]==0) {
+                dfs(child);
+                dp[curr][0] += Math.max(dp[child][0], dp[child][1]);
+                dp[curr][1] += dp[child][0];
+            }
+        }
+    }
+}
